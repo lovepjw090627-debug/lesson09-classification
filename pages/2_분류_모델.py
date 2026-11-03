@@ -53,4 +53,42 @@ st.markdown(
 
 
 @st.cache_data(show_spinner="데이터를 불러오는 중입니다...")
-def load_data() ->
+def load_data():
+    return pd.read_csv(DATA_URL, encoding="utf-8")
+
+
+st.title("🧪 분류 모델")
+st.write(
+    "여러 정보를 입력으로 넣어 뇌졸중인지 아닌지(`stroke`)를 맞히는 모델을 만들어 봅니다. "
+    "여기서는 뇌졸중(`stroke`=1)을 **양성**, 아님(0)을 음성으로 둡니다."
+)
+
+try:
+    df = load_data()
+except Exception as e:  # 네트워크 오류 등
+    st.error(f"데이터를 불러오지 못했습니다: {e}")
+    st.stop()
+
+# ------------------------------------------------------------------
+# 1. 입력 속성 고르기
+# ------------------------------------------------------------------
+st.header("1. 입력으로 사용할 속성 고르기")
+
+selected = st.multiselect(
+    "입력 속성",
+    options=FEATURES,
+    default=DEFAULT_FEATURES,
+    format_func=lambda c: KOREAN[c],
+)
+
+if len(selected) < 2:
+    st.info(
+        "입력 속성을 두 개 이상 골라 주세요. "
+        "두 개보다 적으면 두 속성으로 그리는 그림을 만들 수 없어서 여기서 멈춥니다."
+    )
+    st.stop()
+
+cols = [c for c in FEATURES if c in selected]  # 항상 같은 순서로 맞춘다
+
+# ------------------------------------------------------------------
+# 2. 데이터 나누기 (번호 순으로
